@@ -1,7 +1,7 @@
 import React from 'react';
 
 require('pdfjs-dist/build/pdf.combined');
-require('pdfjs-dist/web/compatibility');
+// require('pdfjs-dist/web/compatibility');
 
 const makeCancelable = (promise) => {
   let hasCanceled = false;
