@@ -96,9 +96,15 @@ class Pdf extends React.Component {
     this.onDocumentComplete = this.onDocumentComplete.bind(this);
     this.onPageComplete = this.onPageComplete.bind(this);
     this.getDocument = this.getDocument.bind(this);
+    this.onClick = this.onClick.bind(this);
+  }
+
+  onClick(event){
+    console.log('PDF on click event called');
   }
 
   componentDidMount() {
+    console.log("PDF - On componentDidMount...");
     this.loadPDFDocument(this.props);
     this.renderPdf();
   }
@@ -157,6 +163,7 @@ class Pdf extends React.Component {
   }
 
   onDocumentComplete(pdf) {
+    console.log("PDF - On doc complete...");
     this.setState({ pdf });
     const { onDocumentComplete, onContentAvailable, onBinaryContentAvailable } = this.props;
     if (typeof onDocumentComplete === 'function') {
@@ -169,6 +176,7 @@ class Pdf extends React.Component {
   }
 
   onPageComplete(page) {
+    console.log("PDF - On page complete...");
     this.setState({ page });
     this.renderPdf();
     const { onPageComplete } = this.props;
@@ -221,15 +229,20 @@ class Pdf extends React.Component {
     }
   }
 
-  renderPdf() {
+ renderPdf() {
+    console.log("rendering PDF...");
     const { page } = this.state;
     if (page) {
       const { canvas } = this;
       const canvasContext = canvas.getContext('2d');
       const { scale } = this.props;
       const viewport = page.getViewport(scale);
+      // const viewport = page.getViewport(canvas.width / page.getViewport(1.0).width);
+      // canvas.height = viewport.height * 2.5;
+      // canvas.width = viewport.width * 2.5;
       canvas.height = viewport.height;
       canvas.width = viewport.width;
+      console.log('canvas w: ' + canvas.width + ' h: ' + canvas.height);
       page.render({ canvasContext, viewport });
     }
   }
@@ -238,7 +251,11 @@ class Pdf extends React.Component {
     const { loading } = this.props;
     const { page } = this.state;
     return page ?
-      <canvas ref={(c) => { this.canvas = c; }} /> :
+      <canvas
+        ref={(c) => { this.canvas = c; }}
+        className={this.props.className}
+        style={this.props.style}
+      /> :
       loading || <div>Loading PDF...</div>;
   }
 }
@@ -246,8 +263,12 @@ class Pdf extends React.Component {
 Pdf.displayName = 'react-pdf-js';
 Pdf.propTypes = {
   content: React.PropTypes.string,
-  documentInitParameters: React.PropTypes.shape,
-  binaryContent: React.PropTypes.shape,
+  documentInitParameters: React.PropTypes.shape({
+    url: React.PropTypes.string,
+  }),
+  binaryContent: React.PropTypes.shape({
+    data: React.PropTypes.any,
+  }),
   file: React.PropTypes.any, // Could be File object or URL string.
   loading: React.PropTypes.any,
   page: React.PropTypes.number,
@@ -257,6 +278,10 @@ Pdf.propTypes = {
   binaryToBase64: React.PropTypes.func,
   onDocumentComplete: React.PropTypes.func,
   onPageComplete: React.PropTypes.func,
+  handleEvent: React.PropTypes.func,
+  onClick: React.PropTypes.func,
+  className: React.PropTypes.string,
+  style: React.PropTypes.object,
 };
 Pdf.defaultProps = { page: 1, scale: 1.0 };
 
